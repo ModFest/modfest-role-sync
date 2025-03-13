@@ -1,0 +1,14 @@
+[versions]
+loom = "1.10.+"
+
+mc = "1.21"
+fl = "0.16.10"
+yarn = "1.21+build.9"
+
+[plugins]
+loom = { id = "fabric-loom", version.ref = "loom" }
+
+[libraries]
+mc = { group = "mojang", name = "minecraft", version.ref = "mc" }
+fl = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fl" }
+yarn = { group = "net.fabricmc", name = "yarn", version.ref = "yarn" }
