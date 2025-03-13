@@ -1,9 +1,10 @@
 [versions]
 loom = "1.10.+"
 
-mc = "1.21"
+mc = "1.21.1"
 fl = "0.16.10"
 yarn = "1.21+build.9"
+player-roles = "1.6.13"
 
 [plugins]
 loom = { id = "fabric-loom", version.ref = "loom" }
@@ -12,3 +13,5 @@ loom = { id = "fabric-loom", version.ref = "loom" }
 mc = { group = "mojang", name = "minecraft", version.ref = "mc" }
 fl = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fl" }
 yarn = { group = "net.fabricmc", name = "yarn", version.ref = "yarn" }
+playerroles = { group = "dev.gegy", name = "player-roles", version.ref = "player-roles" }
+playerrolesapi = { group = "dev.gegy", name = "player-roles-api", version.ref = "player-roles" }

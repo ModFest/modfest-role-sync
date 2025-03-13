@@ -7,7 +7,18 @@ version = "$baseVersion"
 archivesBaseName = project.slug
 
 repositories {
-	maven { url "https://maven.nucleoid.xyz/" }
+	maven {
+		url "https://maven.gegy.dev/"
+		content {
+			includeGroupAndSubgroups("dev.gegy")
+		}
+	}
+	maven {
+		url "https://maven.nucleoid.xyz/"
+		content {
+			includeGroupAndSubgroups("xyz.nucleoid")
+		}
+	}
 }
 
 loom {
@@ -26,6 +37,8 @@ dependencies {
 	mappings variantOf(libs.yarn) { classifier "v2" }
 
 	modImplementation libs.fl
+	modImplementation libs.playerrolesapi
+	modRuntimeOnly libs.playerroles
 }
 
 processResources {
