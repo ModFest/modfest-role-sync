@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.UUID;
 
 public class ModFestRoleSync implements ModInitializer {
 	public static final String MOD_ID = "modfest-role-sync";
@@ -25,6 +26,10 @@ public class ModFestRoleSync implements ModInitializer {
 		PLAYER_ROLES_LOOKUP = new WrappedLookup(rootLookup);
 		PlayerRolesApi.setRoleLookup(PLAYER_ROLES_LOOKUP);
 		init(new Slf4jLogger(LOGGER));
+	}
+
+	public static boolean isWhitelist(UUID uuid) {
+		return PLAYER_ROLES_LOOKUP.platformLookup.getRoleUUID(uuid) != null;
 	}
 
 	public static void init(MiniLogger logger) {

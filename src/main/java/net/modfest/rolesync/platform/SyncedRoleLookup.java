@@ -62,6 +62,11 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 	}
 
 	@Override
+	public @Nullable Role getRoleUUID(UUID id) {
+		return assignedRoles.get(id);
+	}
+
+	@Override
 	public void close() throws IOException {
 		this.sseClient.close();
 	}
