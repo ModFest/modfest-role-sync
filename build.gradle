@@ -1,6 +1,7 @@
 plugins {
 	id "maven-publish"
 	alias libs.plugins.loom
+	alias libs.plugins.shadow
 }
 
 version = "$baseVersion"
@@ -19,6 +20,12 @@ repositories {
 			includeGroupAndSubgroups("xyz.nucleoid")
 		}
 	}
+	maven {
+		url "https://maven.theepicblock.nl/"
+		content {
+			includeGroupAndSubgroups("nl.theepicblock")
+		}
+	}
 }
 
 loom {
@@ -32,6 +39,11 @@ loom {
 	}
 }
 
+configurations {
+	shadow {
+	}
+}
+
 dependencies {
 	minecraft libs.mc
 	mappings variantOf(libs.yarn) { classifier "v2" }
@@ -39,6 +51,21 @@ dependencies {
 	modImplementation libs.fl
 	modImplementation libs.playerrolesapi
 	modRuntimeOnly libs.playerroles
+
+	shadow libs.javasseclient
+	implementation libs.javasseclient
+}
+
+var shadowJar = tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+	configurations = [project.configurations.shadow]
+	destinationDirectory = tasks.named("jar").flatMap {it.destinationDirectory }
+	minimize()
+	enableRelocation = true
+	relocationPrefix = "net.modfest.rolesync"
+}
+
+remapJar {
+	inputFile = shadowJar.flatMap { it.archiveFile }
 }
 
 processResources {
