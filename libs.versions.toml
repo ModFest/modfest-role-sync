@@ -6,7 +6,7 @@ mc = "1.21.1"
 fl = "0.16.10"
 yarn = "1.21+build.9"
 player-roles = "1.6.13"
-java-sse-client = "0.2.0"
+java-sse-client = "0.3.1"
 
 [plugins]
 loom = { id = "fabric-loom", version.ref = "loom" }
