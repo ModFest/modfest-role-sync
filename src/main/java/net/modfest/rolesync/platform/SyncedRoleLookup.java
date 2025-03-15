@@ -4,6 +4,7 @@ import com.mojang.util.UndashedUuid;
 import dev.gegy.roles.api.PlayerRolesApi;
 import dev.gegy.roles.api.Role;
 import net.minecraft.entity.player.PlayerEntity;
+import net.modfest.rolesync.ModFestRoleSync;
 import net.modfest.rolesync.PlatformRoleLookup;
 import net.modfest.rolesync.config.BehaviourConfig;
 import net.modfest.rolesync.config.PlatformConfig;
@@ -51,14 +52,15 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 							}
 						}
 					}
-					}
+				}
 			}
 		};
 	}
 
 	@Override
 	public @Nullable Role getRole(PlayerEntity player) {
-		return assignedRoles.get(player.getUuid());
+		return teamMemberRole;
+//		return assignedRoles.get(player.getUuid());
 	}
 
 	@Override
