@@ -23,6 +23,9 @@ public class ModFestRoleSync implements ModInitializer {
 	public void onInitialize() {
 		// Wrap player roles' lookup with ours
 		var rootLookup = PlayerRolesApi.lookup();
+		if (rootLookup == null) {
+			throw new IllegalStateException();
+		}
 		PLAYER_ROLES_LOOKUP = new WrappedLookup(rootLookup);
 		PlayerRolesApi.setRoleLookup(PLAYER_ROLES_LOOKUP);
 		setPlatformLookup(PlatformRoleLookup.EMPTY);
