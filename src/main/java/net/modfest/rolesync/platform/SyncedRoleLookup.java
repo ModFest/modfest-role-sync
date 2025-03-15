@@ -59,8 +59,7 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 
 	@Override
 	public @Nullable Role getRole(PlayerEntity player) {
-		return teamMemberRole;
-//		return assignedRoles.get(player.getUuid());
+		return assignedRoles.get(player.getUuid());
 	}
 
 	@Override
