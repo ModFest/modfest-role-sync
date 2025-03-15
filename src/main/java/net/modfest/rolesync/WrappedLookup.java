@@ -32,25 +32,38 @@ public class WrappedLookup implements RoleLookup {
 	public @NotNull RoleReader byPlayer(PlayerEntity player) {
 		var additionalRole = this.platformLookup.getRole(player);
 		if (additionalRole != null) {
-
+			return new MergedRoleReader(additionalRole, root.byPlayer(player));
 		}
 		return root.byPlayer(player);
 	}
 
 	@Override
 	public @NotNull RoleReader byEntity(Entity entity) {
+		if (entity instanceof PlayerEntity player) {
+			var additionalRole = this.platformLookup.getRole(player);
+			if (additionalRole != null) {
+				return new MergedRoleReader(additionalRole, root.byEntity(entity));
+			}
+		}
 		return root.byEntity(entity);
 	}
 
 	@Override
 	public @NotNull RoleReader bySource(ServerCommandSource serverCommandSource) {
+		var entity = serverCommandSource.getEntity();
+		if (entity instanceof PlayerEntity player) {
+			var additionalRole = this.platformLookup.getRole(player);
+			if (additionalRole != null) {
+				return new MergedRoleReader(additionalRole, root.byEntity(entity));
+			}
+		}
 		return root.bySource(serverCommandSource);
 	}
 
 	/**
 	 * Extends a {@link RoleReader} with an additional role
 	 */
-	private record mergedRoleReader(@NotNull Role additional, @NotNull RoleReader root) implements RoleReader {
+	private record MergedRoleReader(@NotNull Role additional, @NotNull RoleReader root) implements RoleReader {
 		@Override
 		public boolean has(Role role) {
 			return role == additional || root.has(role);
