@@ -44,8 +44,7 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 						if (Objects.equals(user.role(), "team_member")) {
 							assignedRoles.put(u, teamMemberRole);
 						} else {
-							var p = assignedRoles.get(u);
-							if (p != null && p != teamMemberRole) {
+							if (assignedRoles.get(u) != teamMemberRole) {
 								if (user.registered() != null && user.registered().contains(behaviourConfig.eventId())) {
 									assignedRoles.put(u, participantRole);
 								}
