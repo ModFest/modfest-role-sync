@@ -1,11 +1,13 @@
 {
-  "required": true,
-  "package": "net.modfest.rolesync.mixin",
-  "compatibilityLevel": "JAVA_21",
-  "mixins": [
-    "MixinWhitelist"
-  ],
-  "injectors": {
-    "defaultRequire": 1
+	"required": true,
+	"package": "net.modfest.rolesync.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"MixinPlayerRolesInit",
+		"MixinPlayerRolesReload",
+		"MixinWhitelist"
+	],
+	"injectors": {
+		"defaultRequire": 1
 	}
 }

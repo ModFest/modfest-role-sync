@@ -25,7 +25,7 @@ public class ModFestRoleSync implements ModInitializer {
 		var rootLookup = PlayerRolesApi.lookup();
 		PLAYER_ROLES_LOOKUP = new WrappedLookup(rootLookup);
 		PlayerRolesApi.setRoleLookup(PLAYER_ROLES_LOOKUP);
-		init(new Slf4jLogger(LOGGER));
+		setPlatformLookup(PlatformRoleLookup.EMPTY);
 	}
 
 	public static boolean isWhitelist(UUID uuid) {

@@ -50,7 +50,7 @@ dependencies {
 
 	modImplementation libs.fl
 	modImplementation libs.playerrolesapi
-	modRuntimeOnly libs.playerroles
+	modImplementation libs.playerroles
 
 	shadow libs.javasseclient
 	implementation libs.javasseclient
