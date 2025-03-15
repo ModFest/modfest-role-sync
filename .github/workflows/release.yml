@@ -1,9 +1,12 @@
-name: Build
+name: Release
 
-on: [ push, pull_request ]
+on:
+  release:
+    types:
+      - published
 
 jobs:
-  build:
+  upload:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -23,8 +26,8 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: capture build artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload GitHub release
+        uses: AButler/upload-release-assets@v2.0
         with:
-          name: Artifacts
-          path: build/libs/
+          files: 'build/libs/*.jar;!build/libs/*-sources.jar;!build/libs/*-dev.jar'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
