@@ -30,7 +30,8 @@
 	],
 	"depends": {
 		"minecraft": ">=1.21",
-		"fabricloader": ">=${fl}"
+		"fabricloader": ">=${fl}",
+		"player_roles": ">=1.6.13"
 	},
 	"suggests": {
 	}
