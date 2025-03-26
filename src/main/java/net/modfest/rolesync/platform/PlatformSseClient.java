@@ -138,7 +138,7 @@ public abstract class PlatformSseClient extends SseClient {
 
 	@Override
 	public void close() {
-		this.client.close();
+		this.client.shutdownNow();
 		super.close();
 	}
 }
