@@ -1,7 +1,10 @@
 package net.modfest.rolesync;
 
 import dev.gegy.roles.api.PlayerRolesApi;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.modfest.rolesync.config.ConfigReader;
 import net.modfest.rolesync.logging.MiniLogger;
 import net.modfest.rolesync.logging.Slf4jLogger;
@@ -21,9 +24,13 @@ public class ModFestRoleSync implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+			ServerLifecycleEvents.SERVER_STOPPING.register((server) -> deinit());
+		}
+		Runtime.getRuntime().addShutdownHook(new Thread(ModFestRoleSync::deinit));
 	}
 
-	public static void onPlayerRolesInit() {
+	public static void hookPlayerRoles() {
 		// Wrap player roles' lookup with ours
 		var rootLookup = PlayerRolesApi.lookup();
 		if (rootLookup == null) {
@@ -61,6 +68,11 @@ public class ModFestRoleSync implements ModInitializer {
 			setPlatformLookup(PlatformRoleLookup.EMPTY);
 			return;
 		}
+	}
+
+	public static void deinit() {
+		ModFestRoleSync.LOGGER.info("Closing sync");
+		setPlatformLookup(PlatformRoleLookup.EMPTY);
 	}
 
 	public static void setPlatformLookup(PlatformRoleLookup platformLookup) {

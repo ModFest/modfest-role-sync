@@ -11,6 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinPlayerRolesInit {
 	@Inject(method = "onInitialize", at = @At("RETURN"))
 	private void onInit(CallbackInfo ci) {
-		ModFestRoleSync.onPlayerRolesInit();
+		ModFestRoleSync.hookPlayerRoles();
 	}
 }

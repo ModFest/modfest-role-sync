@@ -31,6 +31,7 @@
 	"depends": {
 		"minecraft": ">=1.21",
 		"fabricloader": ">=${fl}",
+		"fabric-api": ">={fapi}",
 		"player_roles": ">=1.6.13"
 	},
 	"suggests": {

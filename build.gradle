@@ -49,6 +49,7 @@ dependencies {
 	mappings variantOf(libs.yarn) { classifier "v2" }
 
 	modImplementation libs.fl
+	modImplementation libs.fapi
 	modImplementation libs.playerrolesapi
 	modImplementation libs.playerroles
 
