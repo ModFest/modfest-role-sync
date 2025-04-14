@@ -46,6 +46,8 @@ public class ModFestRoleSync implements ModInitializer {
 	}
 
 	public static void init(MiniLogger logger) {
+//		setPlatformLookup(new TestLookup("test"));
+//		if (true) return;
 		var behaviourConfig = ConfigReader.readBehaviourConfig();
 		var platformConfig = ConfigReader.readPlatformConfig();
 
@@ -85,5 +87,9 @@ public class ModFestRoleSync implements ModInitializer {
 			} catch (IOException ignored) {}
 		}
  		PLAYER_ROLES_LOOKUP.platformLookup = platformLookup;
+	}
+
+	public static PlatformRoleLookup getPlatformLookup() {
+		return PLAYER_ROLES_LOOKUP.platformLookup;
 	}
 }

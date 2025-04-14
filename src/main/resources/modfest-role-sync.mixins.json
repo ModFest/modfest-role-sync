@@ -5,7 +5,9 @@
 	"mixins": [
 		"MixinPlayerRolesInit",
 		"MixinPlayerRolesReload",
-		"MixinWhitelist"
+		"MixinWhitelist",
+		"PlayerRolesPeek",
+		"RoleSetAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1
