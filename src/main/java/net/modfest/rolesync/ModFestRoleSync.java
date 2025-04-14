@@ -81,7 +81,7 @@ public class ModFestRoleSync implements ModInitializer {
 		if (PLAYER_ROLES_LOOKUP == null) {
 			throw new IllegalStateException("Trying to set platform lookup before role sync was initialized");
 		}
-		if (PLAYER_ROLES_LOOKUP instanceof Closeable c) {
+		if (PLAYER_ROLES_LOOKUP.platformLookup instanceof Closeable c) {
 			try {
 				c.close();
 			} catch (IOException ignored) {}
