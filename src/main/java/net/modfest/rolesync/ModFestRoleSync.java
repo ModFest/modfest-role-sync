@@ -5,6 +5,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.modfest.rolesync.cache.CacheManager;
 import net.modfest.rolesync.config.ConfigReader;
 import net.modfest.rolesync.logging.MiniLogger;
 import net.modfest.rolesync.logging.Slf4jLogger;
@@ -62,7 +63,7 @@ public class ModFestRoleSync implements ModInitializer {
 		}
 
 		try {
-			var lookup = new SyncedRoleLookup(behaviourConfig, platformConfig);
+			var lookup = new SyncedRoleLookup(behaviourConfig, platformConfig, new CacheManager());
 			setPlatformLookup(lookup);
 			return;
 		} catch (RuntimeException e) {
