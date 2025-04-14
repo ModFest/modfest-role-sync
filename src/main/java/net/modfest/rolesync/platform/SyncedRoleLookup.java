@@ -1,5 +1,6 @@
 package net.modfest.rolesync.platform;
 
+import com.mojang.util.UndashedUuid;
 import dev.gegy.roles.api.PlayerRolesApi;
 import dev.gegy.roles.api.Role;
 import net.minecraft.entity.player.PlayerEntity;
@@ -65,7 +66,7 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 						p.getLeft().minecraft_accounts()
 							.stream().map(uuidStr -> {
 								try {
-									return UUID.fromString(uuidStr);
+									return UndashedUuid.fromStringLenient(uuidStr);
 								} catch (IllegalArgumentException ignored) {
 									return null;
 								}
