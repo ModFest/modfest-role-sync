@@ -108,6 +108,8 @@ public abstract class PlatformSseClient extends SseClient {
 			LOGGER.error("Failed to subscribe to platform. Http status code 403");
 			return null; // don't reconnect
 		}
+		// TODO some way of figuring out which exceptions are weird and which ones are simply timeouts.
+		//      We need some logging!!
 		var reconnTime = reconnectionInfo.wasConnectionInvalid() ?
 			// Something is majorly wrong. Give the server some time
 			Duration.ofMinutes(1)
@@ -130,7 +132,7 @@ public abstract class PlatformSseClient extends SseClient {
 
 	@Override
 	public void onDisconnect() {
-		LOGGER.info("Disconnected from platform");
+		LOGGER.debug("Disconnected from platform");
 		super.onDisconnect();
 	}
 
