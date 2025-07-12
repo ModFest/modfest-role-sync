@@ -99,6 +99,7 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 							assignedRoles.put(uuid, participantRole);
 						}
 					}
+					case null -> {}
 				}
 			});
 		} finally {
