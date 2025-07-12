@@ -13,6 +13,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ public class CacheManager {
 	private static final long MAGIC = 0xBEBE220da001BEBEL;
 	private final @NonNull Path location;
 	private byte[] hash;
+	private ReentrantLock writeLock = new ReentrantLock();
 
 	public CacheManager() {
 		this(FabricLoader.getInstance().getGameDir().resolve("platform_role_cache.bin"));
@@ -32,7 +34,9 @@ public class CacheManager {
 	}
 
 	public void read(Consumer<Stream<Pair<UUID,SyncedRole>>> onReadFinished) {
-		var t = new Thread(() -> {
+		// No protection is needed against two threads reading at once. The callback already
+		// has locking and checks the time of each read
+		var readThread = new Thread(() -> {
 			// We simultaneously read the file and compute its hash, for future reference
 			var hash = Hashing.sha512();
 			try (var hashStream = new HashingInputStream(hash, new BufferedInputStream(new FileInputStream(location.toFile())))) {
@@ -64,11 +68,13 @@ public class CacheManager {
 
 			} catch (IOException e) {
 				ModFestRoleSync.LOGGER.warn("Couldn't read cache file", e);
+			} catch (Throwable t) {
+				ModFestRoleSync.LOGGER.error("Unexpected error whilst reading cache file", t);
 			}
 		});
-		t.setName("ModfestRoleSync-Read");
-		t.setDaemon(true);
-		t.start();
+		readThread.setName("ModfestRoleSync-Read");
+		readThread.setDaemon(true);
+		readThread.start();
 	}
 
 	public void write(Supplier<Stream<Pair<UUID,SyncedRole>>> provider) {
@@ -76,33 +82,39 @@ public class CacheManager {
 		// This function should only be running whenever the server shuts down (or
 		// something in the configuration changes), so there's little performance concern
 		// in creating a new thread every time.
-		// TODO we should probably ensure that there aren't two threads running at once
-		var t = new Thread(() -> {
-			// Ensure the list is consistent by sorting it by uuid
-			var list = provider.get().collect(Collectors.toCollection(ArrayList::new));
-			list.sort(Comparator.comparing(Pair::getLeft));
-			// We write the collection to a hashing output first, and we only save the file if
-			// the hash changes
-			var hash = Hashing.sha512();
-			try (var hashStream = new HashingOutputStream(hash, OutputStream.nullOutputStream())) {
-				write(list, hashStream);
-				if (Arrays.equals(this.hash, hashStream.hash().asBytes())) {
-					ModFestRoleSync.LOGGER.info("Not writing cache as it hasn't changed");
-				} else {
-					// The hash changed! Write the actual file
-					if (!Files.exists(this.location)) {
-						Files.createFile(this.location);
+		var writeThread = new Thread(() -> {
+			writeLock.lock();
+			try {
+				// Ensure the list is consistent by sorting it by uuid
+				var list = provider.get().collect(Collectors.toCollection(ArrayList::new));
+				list.sort(Comparator.comparing(Pair::getLeft));
+				// We write the collection to a hashing output first, and we only save the file if
+				// the hash changes
+				var hash = Hashing.sha512();
+				try (var hashStream = new HashingOutputStream(hash, OutputStream.nullOutputStream())) {
+					write(list, hashStream);
+					if (Arrays.equals(this.hash, hashStream.hash().asBytes())) {
+						ModFestRoleSync.LOGGER.info("Not writing cache as it hasn't changed");
+					} else {
+						// The hash changed! Write the actual file
+						if (!Files.exists(this.location)) {
+							Files.createFile(this.location);
+						}
+						try (var realStream = new BufferedOutputStream(new FileOutputStream(this.location.toFile()))) {
+							write(list, realStream);
+						}
 					}
-					try (var realStream = new BufferedOutputStream(new FileOutputStream(this.location.toFile()))) {
-						write(list, realStream);
-					}
+				} catch (IOException e) {
+					ModFestRoleSync.LOGGER.warn("Couldn't write cache file", e);
 				}
-			} catch (IOException e) {
-				ModFestRoleSync.LOGGER.warn("Couldn't write cache file", e);
+			} catch (Throwable t) {
+				ModFestRoleSync.LOGGER.error("Unexpected error whilst writing cache file", t);
+			} finally {
+				writeLock.unlock();
 			}
 		});
-		t.setName("ModfestRoleSync-Write");
-		t.start();
+		writeThread.setName("ModfestRoleSync-Write");
+		writeThread.start();
 	}
 
 	private void write(List<Pair<UUID,SyncedRole>> data, OutputStream stream) throws IOException {
