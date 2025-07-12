@@ -11,6 +11,7 @@ import net.modfest.rolesync.cache.CacheManager;
 import net.modfest.rolesync.config.BehaviourConfig;
 import net.modfest.rolesync.config.PlatformConfig;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 	private final Role participantRole;
 	private final Role teamMemberRole;
 	private final PlatformSseClient sseClient;
-	private final HashMap<UUID, Role> assignedRoles;
+	private final HashMap<@NonNull UUID, @NonNull Role> assignedRoles;
 	private final CacheManager cacheManager;
 	private final Lock updateLock = new ReentrantLock();
 	private long lastUpdated = Long.MIN_VALUE;
@@ -78,10 +79,10 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 		};
 	}
 
-	private void updateRoles(Supplier<Stream<Pair<UUID,SyncedRole>>> roleSupplier) {
+	private void updateRoles(Supplier<Stream<Pair<@NonNull UUID, @Nullable SyncedRole>>> roleSupplier) {
 		updateRoles(roleSupplier, System.nanoTime());
 	}
-	private void updateRoles(Supplier<Stream<Pair<UUID,SyncedRole>>> roleSupplier, long time) {
+	private void updateRoles(Supplier<Stream<Pair<@NonNull UUID, @Nullable SyncedRole>>> roleSupplier, long time) {
 		updateLock.lock();
 		try {
 			if (lastUpdated > time) {

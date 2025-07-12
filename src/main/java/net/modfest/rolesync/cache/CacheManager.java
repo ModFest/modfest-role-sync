@@ -7,6 +7,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Pair;
 import net.modfest.rolesync.ModFestRoleSync;
 import net.modfest.rolesync.SyncedRole;
+import org.jspecify.annotations.NonNull;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -19,14 +20,14 @@ import java.util.stream.Stream;
 
 public class CacheManager {
 	private static final long MAGIC = 0xBEBE220da001BEBEL;
-	private final Path location;
+	private final @NonNull Path location;
 	private byte[] hash;
 
 	public CacheManager() {
 		this(FabricLoader.getInstance().getGameDir().resolve("platform_role_cache.bin"));
 	}
 
-	public CacheManager(Path location) {
+	public CacheManager(@NonNull Path location) {
 		this.location = location;
 	}
 
