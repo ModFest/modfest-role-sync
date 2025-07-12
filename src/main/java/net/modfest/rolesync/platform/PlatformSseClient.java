@@ -60,6 +60,9 @@ public abstract class PlatformSseClient extends SseClient {
 						onDataUpdate(this.localCache.values());
 						LOGGER.info("Platform connection successfully established");
 					}
+				}).exceptionally((t) -> {
+					LOGGER.error("Unexpected error whilst processing user list", t);
+					return null;
 				});
 			super.onConnect();
 		} catch (Throwable t) {
@@ -90,6 +93,9 @@ public abstract class PlatformSseClient extends SseClient {
 						}
 						onDataUpdate(this.localCache.values());
 					}
+				}).exceptionally((t) -> {
+					LOGGER.error("Unexpected error whilst processing user {}", updatedId, t);
+					return null;
 				});
 		} catch (Throwable t) {
 			LOGGER.error("Failed to update data for {}", updatedId, t);
