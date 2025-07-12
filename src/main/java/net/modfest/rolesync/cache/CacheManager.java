@@ -33,6 +33,7 @@ public class CacheManager {
 
 	public void read(Consumer<Stream<Pair<UUID,SyncedRole>>> onReadFinished) {
 		var t = new Thread(() -> {
+			// We simultaneously read the file and compute its hash, for future reference
 			var hash = Hashing.sha512();
 			try (var hashStream = new HashingInputStream(hash, new BufferedInputStream(new FileInputStream(location.toFile())))) {
 				var s = new DataInputStream(hashStream);
@@ -54,6 +55,9 @@ public class CacheManager {
 					};
 					contents.add(new Pair<>(uuid, role));
 				}
+				// We only set the hash and call the callback if we successfully read the whole file.
+				// It's possible for the file to be corrupt (especially since our writes aren't atomic),
+				// we should be able to recover from that
 				this.hash = hashStream.hash().asBytes();
 				onReadFinished.accept(contents.stream());
 			} catch (FileNotFoundException ignored) {
@@ -68,20 +72,29 @@ public class CacheManager {
 	}
 
 	public void write(Supplier<Stream<Pair<UUID,SyncedRole>>> provider) {
+		// Run on a separate thread to not bog down the server with IO
+		// This function should only be running whenever the server shuts down (or
+		// something in the configuration changes), so there's little performance concern
+		// in creating a new thread every time.
+		// TODO we should probably ensure that there aren't two threads running at once
 		var t = new Thread(() -> {
+			// Ensure the list is consistent by sorting it by uuid
 			var list = provider.get().collect(Collectors.toCollection(ArrayList::new));
 			list.sort(Comparator.comparing(Pair::getLeft));
+			// We write the collection to a hashing output first, and we only save the file if
+			// the hash changes
 			var hash = Hashing.sha512();
 			try (var hashStream = new HashingOutputStream(hash, OutputStream.nullOutputStream())) {
 				write(list, hashStream);
 				if (Arrays.equals(this.hash, hashStream.hash().asBytes())) {
 					ModFestRoleSync.LOGGER.info("Not writing cache as it hasn't changed");
 				} else {
+					// The hash changed! Write the actual file
 					if (!Files.exists(this.location)) {
 						Files.createFile(this.location);
 					}
-					try (var strem = new BufferedOutputStream(new FileOutputStream(this.location.toFile()))) {
-						write(list, strem);
+					try (var realStream = new BufferedOutputStream(new FileOutputStream(this.location.toFile()))) {
+						write(list, realStream);
 					}
 				}
 			} catch (IOException e) {
