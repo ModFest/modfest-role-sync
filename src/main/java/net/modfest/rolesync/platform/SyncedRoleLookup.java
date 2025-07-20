@@ -56,7 +56,7 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 						SyncedRole r;
 						if (Objects.equals(user.role(), "team_member")) {
 							r = SyncedRole.TEAM;
-						} else if (user.registered() != null && user.registered().contains(behaviourConfig.eventId())) {
+						} else if (Objects.equals(user.role(), "volunteer") || (user.registered() != null && user.registered().contains(behaviourConfig.eventId()))) {
 							r = SyncedRole.PARTICIPANT;
 						} else {
 							r = null;
