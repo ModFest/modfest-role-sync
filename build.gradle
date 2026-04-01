@@ -59,12 +59,9 @@ dependencies {
 	implementation libs.javasseclient
 }
 
-jar {
-	destinationDirectory = new java.io.File(project.buildFile, "devlibs")
-}
-
 var shadowJar = tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
 	configurations = [project.configurations.shadow]
+	archiveClassifier = ""
 	minimize()
 	relocate("nl.theepicblock.sseclient", "net.modfest.rolesync.sseclient")
 }
@@ -101,6 +98,8 @@ java {
 }
 
 jar {
+	destinationDirectory.convention(layout.buildDirectory.dir("devlibs"))
+
 	from("LICENSE") {
 		rename { "${it}_${base.archivesName.get()}" }
 	}
