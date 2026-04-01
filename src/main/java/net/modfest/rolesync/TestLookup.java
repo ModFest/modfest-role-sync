@@ -2,7 +2,7 @@ package net.modfest.rolesync;
 
 import dev.gegy.roles.api.PlayerRolesApi;
 import dev.gegy.roles.api.Role;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -13,7 +13,7 @@ public record TestLookup(Role role) implements PlatformRoleLookup {
 	}
 
 	@Override
-	public @Nullable Role getRole(PlayerEntity player) {
+	public @Nullable Role getRole(Player player) {
 		return role;
 	}
 

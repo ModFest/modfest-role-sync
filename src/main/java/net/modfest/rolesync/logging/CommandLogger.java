@@ -1,22 +1,22 @@
 package net.modfest.rolesync.logging;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 
-public record CommandLogger(ServerCommandSource source) implements MiniLogger {
+public record CommandLogger(CommandSourceStack source) implements MiniLogger {
 	@Override
 	public void error(String error) {
-		source.sendError(Text.literal(error));
+		source.sendFailure(Component.literal(error));
 	}
 
 	@Override
 	public void warn(String warning) {
-		source.sendError(Text.literal(warning).formatted(Formatting.YELLOW));
+		source.sendFailure(Component.literal(warning).withStyle(ChatFormatting.YELLOW));
 	}
 
 	@Override
 	public void info(String info) {
-		source.sendFeedback(() -> Text.literal(info), false);
+		source.sendSuccess(() -> Component.literal(info), false);
 	}
 }

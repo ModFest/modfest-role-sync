@@ -5,23 +5,26 @@ plugins {
 }
 
 version = "$baseVersion"
-archivesBaseName = project.slug
+
+base {
+	archivesName = project.slug
+}
 
 repositories {
 	maven {
-		url "https://maven.gegy.dev/"
+		url = "https://maven.gegy.dev/"
 		content {
 			includeGroupAndSubgroups("dev.gegy")
 		}
 	}
 	maven {
-		url "https://maven.nucleoid.xyz/"
+		url = "https://maven.nucleoid.xyz/"
 		content {
 			includeGroupAndSubgroups("xyz.nucleoid")
 		}
 	}
 	maven {
-		url "https://maven.theepicblock.nl/"
+		url = "https://maven.theepicblock.nl/"
 		content {
 			includeGroupAndSubgroups("nl.theepicblock")
 		}
@@ -46,27 +49,24 @@ configurations {
 
 dependencies {
 	minecraft libs.mc
-	mappings variantOf(libs.yarn) { classifier "v2" }
 
-	modImplementation libs.fl
-	modImplementation libs.fapi
-	modImplementation libs.playerrolesapi
-	modImplementation libs.playerroles
+	implementation libs.fl
+	implementation libs.fapi
+	implementation libs.playerrolesapi
+	implementation libs.playerroles
 
 	shadow libs.javasseclient
 	implementation libs.javasseclient
 }
 
-var shadowJar = tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-	configurations = [project.configurations.shadow]
-	destinationDirectory = tasks.named("jar").flatMap {it.destinationDirectory }
-	minimize()
-	enableRelocation = true
-	relocationPrefix = "net.modfest.rolesync"
+jar {
+	destinationDirectory = new java.io.File(project.buildFile, "devlibs")
 }
 
-remapJar {
-	inputFile = shadowJar.flatMap { it.archiveFile }
+var shadowJar = tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+	configurations = [project.configurations.shadow]
+	minimize()
+	relocate("nl.theepicblock.sseclient", "net.modfest.rolesync.sseclient")
 }
 
 processResources {
@@ -91,18 +91,18 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
-	it.options.release = 21
+	it.options.release = 25
 }
 
 java {
 	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${archivesBaseName}" }
+		rename { "${it}_${base.archivesName.get()}" }
 	}
 }
 

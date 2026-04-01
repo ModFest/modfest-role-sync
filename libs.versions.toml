@@ -1,22 +1,20 @@
 [versions]
-loom = "1.10.+"
-shadow = "8.3.6"
+loom = "1.15.+"
+shadow = "9.4.1"
 
-mc = "1.21.1"
-fl = "0.16.10"
-yarn = "1.21+build.9"
-fapi = "0.102.0+1.21"
-player-roles = "1.6.13"
-java-sse-client = "0.3.1"
+mc = "26.1"
+fl = "0.18.5"
+fapi = "0.144.4+26.1"
+player-roles = "1.9.0-pre.1"
+java-sse-client = "0.4.0"
 
 [plugins]
-loom = { id = "fabric-loom", version.ref = "loom" }
+loom = { id = "net.fabricmc.fabric-loom", version.ref = "loom" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow"}
 
 [libraries]
 mc = { group = "mojang", name = "minecraft", version.ref = "mc" }
 fl = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fl" }
-yarn = { group = "net.fabricmc", name = "yarn", version.ref = "yarn" }
 fapi = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.ref = "fapi" }
 playerroles = { group = "dev.gegy", name = "player-roles", version.ref = "player-roles" }
 playerrolesapi = { group = "dev.gegy", name = "player-roles-api", version.ref = "player-roles" }

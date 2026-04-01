@@ -7,13 +7,17 @@ import dev.gegy.roles.api.RoleLookup;
 import dev.gegy.roles.api.RoleReader;
 import dev.gegy.roles.api.override.RoleOverrideReader;
 import dev.gegy.roles.api.override.RoleOverrideType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -29,7 +33,7 @@ public class WrappedLookup implements RoleLookup {
 	}
 
 	@Override
-	public @NotNull RoleReader byPlayer(PlayerEntity player) {
+	public @NotNull RoleReader byPlayer(Player player) {
 		var additionalRole = this.platformLookup.getRole(player);
 		if (additionalRole != null) {
 			return new MergedRoleReader(additionalRole, root.byPlayer(player));
@@ -39,7 +43,7 @@ public class WrappedLookup implements RoleLookup {
 
 	@Override
 	public @NotNull RoleReader byEntity(Entity entity) {
-		if (entity instanceof PlayerEntity player) {
+		if (entity instanceof Player player) {
 			var additionalRole = this.platformLookup.getRole(player);
 			if (additionalRole != null) {
 				return new MergedRoleReader(additionalRole, root.byEntity(entity));
@@ -49,9 +53,9 @@ public class WrappedLookup implements RoleLookup {
 	}
 
 	@Override
-	public @NotNull RoleReader bySource(ServerCommandSource serverCommandSource) {
+	public @NotNull RoleReader bySource(CommandSourceStack serverCommandSource) {
 		var entity = serverCommandSource.getEntity();
-		if (entity instanceof PlayerEntity player) {
+		if (entity instanceof Player player) {
 			var additionalRole = this.platformLookup.getRole(player);
 			if (additionalRole != null) {
 				return new MergedRoleReader(additionalRole, root.byEntity(entity));
