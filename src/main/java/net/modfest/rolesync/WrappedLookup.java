@@ -7,6 +7,8 @@ import dev.gegy.roles.api.RoleLookup;
 import dev.gegy.roles.api.RoleReader;
 import dev.gegy.roles.api.override.RoleOverrideReader;
 import dev.gegy.roles.api.override.RoleOverrideType;
+import dev.gegy.roles.store.PlayerRoleManager;
+import net.fabricmc.fabric.api.permission.v1.PermissionContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -62,6 +64,38 @@ public class WrappedLookup implements RoleLookup {
 			}
 		}
 		return root.bySource(serverCommandSource);
+	}
+
+	/** @noinspection UnstableApiUsage*/
+	@Override
+	public @NotNull RoleReader byPermissionContext(final PermissionContext context) {
+		var originalReader = this.root.byPermissionContext(context);
+
+		var entity = context.get(PermissionContext.ENTITY);
+		if (entity instanceof Player player) {
+			var additionalRole = this.platformLookup.getRole(player);
+			if (additionalRole != null) {
+				return new MergedRoleReader(additionalRole, originalReader);
+			}
+		}
+
+		var source = context.get(PermissionContext.COMMAND_SOURCE_STACK);
+		if (source != null && source.getEntity() instanceof Player player) {
+			var additionalRole = this.platformLookup.getRole(player);
+			if (additionalRole != null) {
+				return new MergedRoleReader(additionalRole, originalReader);
+			}
+		}
+
+		var server = context.get(PermissionContext.SERVER);
+		if (server != null && context.type() == PermissionContext.Type.PLAYER) {
+			var additionalRole = this.platformLookup.getRoleUUID(context.uuid());
+			if (additionalRole != null) {
+				return new MergedRoleReader(additionalRole, originalReader);
+			}
+		}
+
+		return originalReader;
 	}
 
 	/**
