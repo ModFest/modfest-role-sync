@@ -60,7 +60,7 @@ public class WrappedLookup implements RoleLookup {
 		if (entity instanceof Player player) {
 			var additionalRole = this.platformLookup.getRole(player);
 			if (additionalRole != null) {
-				return new MergedRoleReader(additionalRole, root.byEntity(entity));
+				return new MergedRoleReader(additionalRole, root.bySource(serverCommandSource));
 			}
 		}
 		return root.bySource(serverCommandSource);
