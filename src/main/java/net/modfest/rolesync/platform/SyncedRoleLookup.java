@@ -1,9 +1,9 @@
 package net.modfest.rolesync.platform;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.util.UndashedUuid;
 import dev.gegy.roles.api.PlayerRolesApi;
 import dev.gegy.roles.api.Role;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Player;
 import net.modfest.rolesync.PlatformRoleLookup;
 import net.modfest.rolesync.SyncedRole;
@@ -61,10 +61,10 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 						} else {
 							r = null;
 						}
-						return new Tuple<>(user, r);
+						return new Pair<>(user, r);
 					})
 					.flatMap(p ->
-						p.getA().minecraft_accounts()
+						p.getFirst().minecraft_accounts()
 							.stream().map(uuidStr -> {
 								try {
 									return UndashedUuid.fromStringLenient(uuidStr);
@@ -73,16 +73,16 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 								}
 							})
 							.filter(Objects::nonNull)
-							.map(uuid -> new Tuple<>(uuid, p.getB()))
+							.map(uuid -> new Pair<>(uuid, p.getSecond()))
 				));
 			}
 		};
 	}
 
-	private void updateRoles(Supplier<Stream<Tuple<@NonNull UUID, @Nullable SyncedRole>>> roleSupplier) {
+	private void updateRoles(Supplier<Stream<Pair<@NonNull UUID, @Nullable SyncedRole>>> roleSupplier) {
 		updateRoles(roleSupplier, System.nanoTime());
 	}
-	private void updateRoles(Supplier<Stream<Tuple<@NonNull UUID, @Nullable SyncedRole>>> roleSupplier, long time) {
+	private void updateRoles(Supplier<Stream<Pair<@NonNull UUID, @Nullable SyncedRole>>> roleSupplier, long time) {
 		updateLock.lock();
 		try {
 			if (lastUpdated > time) {
@@ -91,8 +91,8 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 			lastUpdated = time;
 			assignedRoles.clear();
 			roleSupplier.get().forEach(p -> {
-				var uuid = p.getA();
-				var role = p.getB();
+				var uuid = p.getFirst();
+				var role = p.getSecond();
 				switch (role) {
 					case TEAM -> assignedRoles.put(uuid, teamMemberRole);
 					case PARTICIPANT -> {
@@ -121,6 +121,6 @@ public class SyncedRoleLookup implements PlatformRoleLookup, Closeable {
 	@Override
 	public void close() throws IOException {
 		this.sseClient.close();
-		this.cacheManager.write(() -> this.assignedRoles.entrySet().stream().map(e -> new Tuple<>(e.getKey(), e.getValue() == teamMemberRole ? SyncedRole.TEAM : SyncedRole.PARTICIPANT)));
+		this.cacheManager.write(() -> this.assignedRoles.entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue() == teamMemberRole ? SyncedRole.TEAM : SyncedRole.PARTICIPANT)));
 	}
 }
